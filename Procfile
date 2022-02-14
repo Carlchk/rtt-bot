@@ -1,1 +1,1 @@
-web: node discord.js
+work: node discord.js
