@@ -1,21 +1,21 @@
 require('dotenv').config()
 const Discord = require('discord.js');
 const client = new Discord.Client();
-// const { token } = require('./token.json');
 const token = process.env.DISCORD_TOKEN
 var cron = require('node-cron');
 
+// Add timestamp on console.log
 console.logCopy = console.log.bind(console);
-
 console.log = function (data) {
-    var currentDate = '[' + new Date().toUTCString() + '] ';
+    var currentDate = '[' + new Date().toLocaleString('en-US', { timeZone: 'Asia/Hong_Kong' }) + '] ';
     this.logCopy(currentDate, data);
 };
 
+// Global State
 var BOARDCAST_CHANNEL = ''
-
 var user_online = {}
 var daily_condom_user = new Set()
+var user_deaf = {}
 
 
 const getOnineUser = () => {
@@ -37,32 +37,62 @@ const getOnineUser = () => {
     return currentOnlineUser
 }
 
+// Initization State of bot
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
-    // console.log(client.user)
     const channel = client.channels.cache.find(channel => channel.name === 'general')
     BOARDCAST_CHANNEL = channel.id
-
     // Get current online user
     user_online = getOnineUser()
 });
 
 
+// TODO: Check 拒聽 (deaf)
 client.on("voiceStateUpdate", async (oldState, newState) => {
+    // console.log(oldState.member.user) // which user triggered deaf
+    // console.log(oldState.deaf) // previous state is deaf?
+    // console.log(newState.deaf) // current state is deaf?
+    const dateTime = Date.now();
+    const timestamp = Math.floor(dateTime / 1000);
+    if (oldState.deaf === false && newState.deaf === true) { // User Deaf
+        console.log(`${oldState.member.user.username} deaf`)
+        // Add user to map if not exists
+        if (user_deaf[oldState.member.user.id] === undefined) {
+            user_deaf[oldState.member.user.id] = {
+                deaf_time_accumulated: 0,         // in second
+                deaf_time: timestamp,               // timestamp to store user deaf starting time
+            }
+        } else {
+            user_deaf[oldState.member.user.id].deaf_time = timestamp
+        }
+    }
+
+    if (oldState.deaf === true && newState.deaf === false) { // User Undeaf
+        console.log(`${oldState.member.user.username} undeaf`)
+
+        const prev_deaf_time = user_deaf[oldState.member.user.id].deaf_time_accumulated
+        const prev_timestamp = user_deaf[oldState.member.user.id].deaf_time
+
+        user_deaf[oldState.member.user.id].deaf_time_accumulated = prev_deaf_time + (timestamp - prev_timestamp)
+
+    }
+    console.log(user_deaf)
+
+    // TODO:
+    // cronjob -> sort by deaf_time_accumulated -> boardcast to channel
+})
+
+// Check quitted channel user
+client.on("voiceStateUpdate", async () => {
     const previousUserOnline = user_online
     const currentOnlineUser = getOnineUser()
-    // console.log(`previousUserOnline:`)
-    // console.log(previousUserOnline)
-    // console.log(`currentOnlineUser:`)
-    // console.log(currentOnlineUser)
-    var arr1 = Object.keys(previousUserOnline)
+    var prev_user_online_arr = Object.keys(previousUserOnline)
     var arr2 = Object.keys(currentOnlineUser)
 
-    let arrayDifference = arr1.filter(x => !arr2.includes(x));
+    let arrayDifference = prev_user_online_arr.filter(x => !arr2.includes(x));
     if (arrayDifference.length > 0) {
-        if (arr1.length >= 4) {
+        if (prev_user_online_arr.length >= 4) {
             const condonUser = previousUserOnline[arrayDifference[0]]
-            // console.log(previousUserOnline[arrayDifference[0]].username)
             client.channels.cache.get(BOARDCAST_CHANNEL).send(`<@${condonUser.id}> condom了大家，真的太無情了`)
             daily_condom_user.add(condonUser.id)
         }
