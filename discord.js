@@ -25,7 +25,7 @@ const getOnineUser = () => {
     for (const [channelID, channel] of allChannels) {
         for (const [memberID, member] of channel.members) {
             const user = member.user
-            if (currentOnlineUser[user.id] === undefined) && user.bot === false {
+            if (currentOnlineUser[user.id] === undefined && user.bot === false) {
                 currentOnlineUser[user.id] = {
                     id: user.id,
                     username: user.username
