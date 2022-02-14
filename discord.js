@@ -24,9 +24,8 @@ const getOnineUser = () => {
     const allChannels = client.channels.cache.filter(c => c.type === 'voice');
     for (const [channelID, channel] of allChannels) {
         for (const [memberID, member] of channel.members) {
-            // console.log(member.user.username)
             const user = member.user
-            if (currentOnlineUser[user.id] === undefined) {
+            if (currentOnlineUser[user.id] === undefined) && user.bot === false {
                 currentOnlineUser[user.id] = {
                     id: user.id,
                     username: user.username
