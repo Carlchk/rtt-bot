@@ -47,39 +47,39 @@ client.on('ready', () => {
 
 
 // TODO: Check 拒聽 (deaf)
-client.on("voiceStateUpdate", async (oldState, newState) => {
-    // console.log(oldState.member.user) // which user triggered deaf
-    // console.log(oldState.deaf) // previous state is deaf?
-    // console.log(newState.deaf) // current state is deaf?
-    const dateTime = Date.now();
-    const timestamp = Math.floor(dateTime / 1000);
-    if (oldState.deaf === false && newState.deaf === true) { // User Deaf
-        console.log(`${oldState.member.user.username} deaf`)
-        // Add user to map if not exists
-        if (user_deaf[oldState.member.user.id] === undefined) {
-            user_deaf[oldState.member.user.id] = {
-                deaf_time_accumulated: 0,         // in second
-                deaf_time: timestamp,               // timestamp to store user deaf starting time
-            }
-        } else {
-            user_deaf[oldState.member.user.id].deaf_time = timestamp
-        }
-    }
+// client.on("voiceStateUpdate", async (oldState, newState) => {
+//     // console.log(oldState.member.user) // which user triggered deaf
+//     // console.log(oldState.deaf) // previous state is deaf?
+//     // console.log(newState.deaf) // current state is deaf?
+//     const dateTime = Date.now();
+//     const timestamp = Math.floor(dateTime / 1000);
+//     if (oldState.deaf === false && newState.deaf === true) { // User Deaf
+//         console.log(`${oldState.member.user.username} deaf`)
+//         // Add user to map if not exists
+//         if (user_deaf[oldState.member.user.id] === undefined) {
+//             user_deaf[oldState.member.user.id] = {
+//                 deaf_time_accumulated: 0,         // in second
+//                 deaf_time: timestamp,               // timestamp to store user deaf starting time
+//             }
+//         } else {
+//             user_deaf[oldState.member.user.id].deaf_time = timestamp
+//         }
+//     }
 
-    if (oldState.deaf === true && newState.deaf === false) { // User Undeaf
-        console.log(`${oldState.member.user.username} undeaf`)
+//     if (oldState.deaf === true && newState.deaf === false) { // User Undeaf
+//         console.log(`${oldState.member.user.username} undeaf`)
 
-        const prev_deaf_time = user_deaf[oldState.member.user.id].deaf_time_accumulated
-        const prev_timestamp = user_deaf[oldState.member.user.id].deaf_time
+//         const prev_deaf_time = user_deaf[oldState.member.user.id].deaf_time_accumulated
+//         const prev_timestamp = user_deaf[oldState.member.user.id].deaf_time
 
-        user_deaf[oldState.member.user.id].deaf_time_accumulated = prev_deaf_time + (timestamp - prev_timestamp)
+//         user_deaf[oldState.member.user.id].deaf_time_accumulated = prev_deaf_time + (timestamp - prev_timestamp)
 
-    }
-    console.log(user_deaf)
+//     }
+//     console.log(user_deaf)
 
-    // TODO:
-    // cronjob -> sort by deaf_time_accumulated -> boardcast to channel
-})
+//     // TODO:
+//     // cronjob -> sort by deaf_time_accumulated -> boardcast to channel
+// })
 
 // Check quitted channel user
 client.on("voiceStateUpdate", async () => {
