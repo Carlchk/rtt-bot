@@ -43,6 +43,7 @@ client.on('ready', () => {
     BOARDCAST_CHANNEL = channel.id
     // Get current online user
     user_online = getOnineUser()
+    // console.log(user_online)
 });
 
 
@@ -91,13 +92,13 @@ client.on("voiceStateUpdate", async () => {
     let arrayDifference = prev_user_online_arr.filter(x => !arr2.includes(x));
     if (arrayDifference.length > 0) {
         if (prev_user_online_arr.length >= 4) {
-            const condonUser = previousUserOnline[arrayDifference[0]]
-            client.channels.cache.get(BOARDCAST_CHANNEL).send(`<@${condonUser.id}> condom了大家，真的太無情了`)
-            daily_condom_user.add(condonUser.id)
+            const condomUser = previousUserOnline[arrayDifference[0]]
+            client.channels.cache.get(BOARDCAST_CHANNEL).send(`党员<@${condomUser.id}>离开了群组，我们怀念他`)
+            daily_condom_user.add(condomUser.id)
         }
     }
     user_online = currentOnlineUser
-    console.log(daily_condom_user)
+    // console.log(daily_condom_user)
 })
 
 cron.schedule('59 23 * * *', () => {
@@ -108,7 +109,7 @@ cron.schedule('59 23 * * *', () => {
         client.channels.cache.get(BOARDCAST_CHANNEL).send(`${counter}. <@${userid}>`)
         counter++
     }
-    client.channels.cache.get(BOARDCAST_CHANNEL).send(`真的太無情了`)
+    client.channels.cache.get(BOARDCAST_CHANNEL).send(`我们怀念他們`)
     daily_condom_user.clear()
 }, {
     scheduled: true,
