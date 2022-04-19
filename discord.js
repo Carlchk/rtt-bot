@@ -104,13 +104,21 @@ client.on("voiceStateUpdate", async () => {
 cron.schedule('59 23 * * *', () => {
     let yourDate = new Date()
     var counter = 1
-    client.channels.cache.get(BOARDCAST_CHANNEL).send(`是日 ${yourDate.toISOString().split('T')[0]} condom名單如下:`)
-    for (let userid of daily_condom_user) {
-        client.channels.cache.get(BOARDCAST_CHANNEL).send(`${counter}. <@${userid}>`)
-        counter++
+    let resultStr = ''
+    if (daily_condom_user.size > 0) {
+        resultStr += `是日 ${yourDate.toISOString().split('T')[0]} condom名單如下:\n`
+        for (let userid of daily_condom_user) {
+            resultStr += `${counter}. <@${userid}>\n`
+            counter++
+        }
+        client.channels.cache.get(BOARDCAST_CHANNEL).send(resultStr)
+        client.channels.cache.get(BOARDCAST_CHANNEL).send(`我们怀念他們`)      
+    } else {
+        client.channels.cache.get(BOARDCAST_CHANNEL).send(`牛b死了,今天竟然没有人condom`)
     }
-    client.channels.cache.get(BOARDCAST_CHANNEL).send(`我们怀念他們`)
+    
     daily_condom_user.clear()
+    resultStr = ''
 }, {
     scheduled: true,
     timezone: "Asia/Hong_Kong"
